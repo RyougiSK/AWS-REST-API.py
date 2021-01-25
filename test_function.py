@@ -1,40 +1,20 @@
-import sys
-import logging
-import rds_config
-import pymysql
-#rds settings
-rds_host  = "52.63.112.33"
-name = "sa"
-password = "TChangeh&33plz7@L"
-db_name = "SSIS"
+import pyodbc
+import pandas as pd
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+def lambda_handler(event, context):
 
-try:
-    conn = pymysql.connect(rds_host, user=name, passwd=password, db=db_name, connect_timeout=5)
-except pymysql.MySQLError as e:
-    logger.error("ERROR: Unexpected error: Could not connect to MySQL instance.")
-    logger.error(e)
-    sys.exit()
+            connection =  pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};'
+            'Server=52.63.112.33;'
+            'Database=SSIS;'
+            'UID=sa;'
+            'PWD=TChangeh&33plz7@L')
 
-logger.info("SUCCESS: Connection to RDS MySQL instance succeeded")
+            cursor = connection.cursor()
+            cursor.execute('create table [dbo].[Employee] ( EmpID  int, Name varchar(255))')
+	        cursor.execute('insert into [dbo].[Employee] (EmpID, Name) values(1, "Joe")')
+            records = cursor.fetchall()
+            print("Version")
+            print(records)
+            connection.close()
 
-
-def handler(event, context):
-    item_count = 0
-
-    with conn.cursor() as cur:
-        cur.execute("create table [dbo].[Employee] ( EmpID  int, Name varchar(255))")
-        cur.execute('insert into [dbo].[Employee] (EmpID, Name) values(1, "Joe")')
-        cur.execute('insert into [dbo].[Employee] (EmpID, Name) values(2, "Bob")')
-        cur.execute('insert into [dbo].[Employee] (EmpID, Name) values(3, "Mary")')
-        conn.commit()
-        cur.execute("select * from [dbo].[Employee]")
-        for row in cur:
-            item_count += 1
-            logger.info(row)
-            #print(row)
-    conn.commit()
-
-    return "Added %d items from RDS MySQL table" %(item_count)
+   
