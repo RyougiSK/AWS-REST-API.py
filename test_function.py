@@ -11,7 +11,7 @@ def lambda_handler(event, context):
 
             cursor = connection.cursor()
             cursor.execute('create table [dbo].[Employee] ( EmpID  int, Name varchar(255))')
-	        cursor.execute('insert into [dbo].[Employee] (EmpID, Name) values(1, "Joe")')
+	    cursor.execute('insert into [dbo].[Employee] (EmpID, Name) values(1, "Joe")')
             records = cursor.fetchall()
             print("Version")
             print(records)
